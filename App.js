@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import PatientReferral from './PatientReferral'; 
 import PatientDetail from './PatientDetail';   
 import Review from './Review';
+import Multistep from './Multistep';
 
 const Stack = createNativeStackNavigator();
 
@@ -12,17 +13,20 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="ReferringDetails" 
+        initialRouteName="PatientReferral"
         screenOptions={{
-          headerShown: false, 
+          headerShown: false,
         }}
       >
+
+        
      
      
         
-        <Stack.Screen name="ReferringDetails" component={PatientReferral} />
+        <Stack.Screen name="PatientReferral" component={PatientReferral} />
         <Stack.Screen name="PatientDetail" component={PatientDetail} />
         <Stack.Screen name="Review" component={Review}/>
+        <Stack.Screen name="Multistep" component={Multistep}/>
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>

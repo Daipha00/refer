@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function Review({ navigation }) {
+   const [currentStep, setCurrentStep] = useState(3);
+    const [selectedLevel, setSelectedLevel] = useState(null);
+    const levels = [
+    { id: 'low', label: 'Low I' },
+    { id: 'medium', label: 'Medium II' }, 
+    { id: 'high', label: 'High III' }
+  ];
+
   return (
     <View style={styles.container}>
     <ScrollView  contentContainerStyle={styles.scrollContent}>
@@ -12,17 +20,32 @@ export default function Review({ navigation }) {
       </TouchableOpacity>
 
       {/* Stepper */}
-      <View style={styles.stepper}>
-        <Text style={styles.stepDone}>1. Referring Details</Text>
-        <Text style={styles.stepDone}>2. Patient Detail</Text>
-        <Text style={styles.stepActive}>3. Review</Text>
-      </View>
+     <View style={styles.tabsContainer}>
+                    <TouchableOpacity 
+                      style={[styles.tab, currentStep === 1 && styles.activeTab]}
+                      onPress={() => setCurrentStep(1)}
+                    >
+                      <Text style={[styles.tabText, currentStep === 1 && styles.activeTabText]}>1. Referring Details</Text>
+                      {currentStep === 1 && <View style={styles.activeUnderline} />}
+                    </TouchableOpacity>
+            
+                    <TouchableOpacity 
+                      style={[styles.tab, currentStep === 2 && styles.activeTab]}
+                      onPress={() => setCurrentStep(2)}
+                    >
+                      <Text style={[styles.tabText, currentStep === 2 && styles.activeTabText]}>2. Patient Detail</Text>
+                      {currentStep === 2 && <View style={styles.activeUnderline} />}
+                    </TouchableOpacity>
+            
+                    <TouchableOpacity 
+                      style={[styles.tab, currentStep === 3 && styles.activeTab]}
+                      onPress={() => setCurrentStep(3)}
+                    >
+                      <Text style={[styles.tabText, currentStep === 3 && styles.activeTabText]}>3. Review</Text>
+                      {currentStep === 3 && <View style={styles.activeUnderline} />}
+                    </TouchableOpacity>
+                  </View>
 
-    
-      {/* <View style={styles.alertBox}>
-        <Ionicons name="warning-outline" size={20} color="darkred" style={{ marginRight: 5 }} />
-        <Text style={styles.alertText}>This case has a high emergency level and requires urgent attention.</Text>
-      </View> */}
 
       {/* Patient Details */}
       <View style={styles.card}>
@@ -122,15 +145,55 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F7FAFC',
-    padding: 16,
+    padding: 10,
   },
   backButton: {
     marginBottom: 10,
   },
-  stepper: {
+    header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 12,
+  },
+ tabsContainer: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    alignItems: 'center',
+    padding: 12,
+  },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  activeTab: {
+    backgroundColor: '#f8fafc',
+  },
+  tabText: {
+    fontSize: 14,
+    color: '#6b7280',
+  },
+  activeTabText: {
+    color: '#007AFF',
+    fontWeight: '500',
+  },
+  activeUnderline: {
+    height: 2,
+    backgroundColor: '#007AFF',
+    width: '100%',
+    marginTop: 8,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
   },
   scrollContent: {
     padding: 16,

@@ -17,6 +17,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 const PatientDetail = () => {
   const navigation = useNavigation();
   const [comment, setComment] = useState('');
+   const [currentStep, setCurrentStep] = useState(2);
   const [selected, setSelected] = useState(null);
   const [sexOpen, setSexOpen] = useState(false);
   const [sexValue, setSexValue] = useState('Female');
@@ -26,9 +27,11 @@ const PatientDetail = () => {
     { label: 'Other', value: 'Other' },
   ]);
 
-  const [selectedFile, setSelectedFile] = useState(null);
+ const [selectedLevel3, setSelectedLevel3] = useState(null);
+ const [selectedFile, setSelectedFile] = useState(null);
 
-  const levels = [
+
+  const levels3 = [
     { label: 'Low', value: 'low', color: '#4cd964', icon: 'signal-cellular-1-bar' },
     { label: 'Medium', value: 'medium', color: '#ffcc00', icon: 'signal-cellular-2-bar' },
     { label: 'High', value: 'high', color: '#ff3b30', icon: 'signal-cellular-3-bar' },
@@ -67,26 +70,35 @@ const PatientDetail = () => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <AntDesign name="arrowleft" size={24} color="black" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Patient's Referral</Text>
+          <Text style={styles.headerTitle}></Text>
         </View>
 
         {/* Progress Bar */}
-        <View style={styles.progressBar}>
-          <TouchableOpacity style={styles.progressStep} onPress={() => navigation.navigate('ReferringDetails')}>
-            <Text style={styles.progressStepNumber}>1.</Text>
-            <Text style={styles.progressStepText}>Referring Details</Text>
-          </TouchableOpacity>
-          <View style={styles.progressSeparator} />
-          <TouchableOpacity style={styles.progressStep} onPress={() => navigation.navigate('PatientDetail')}>
-            <Text style={styles.progressStepNumber}>2.</Text>
-            <Text style={styles.progressStepTextActive}>Patient Detail</Text>
-          </TouchableOpacity>
-          <View style={styles.progressSeparator} />
-          <TouchableOpacity style={styles.progressStep}>
-            <Text style={styles.progressStepNumber}>3.</Text>
-            <Text style={styles.progressStepText}>Review</Text>
-          </TouchableOpacity>
-        </View>
+        <View style={styles.tabsContainer}>
+               <TouchableOpacity 
+                 style={[styles.tab, currentStep === 1 && styles.activeTab]}
+                 onPress={() => setCurrentStep(1)}
+               >
+                 <Text style={[styles.tabText, currentStep === 1 && styles.activeTabText]}>1. Referring Details</Text>
+                 {currentStep === 1 && <View style={styles.activeUnderline} />}
+               </TouchableOpacity>
+       
+               <TouchableOpacity 
+                 style={[styles.tab, currentStep === 2 && styles.activeTab]}
+                 onPress={() => setCurrentStep(2)}
+               >
+                 <Text style={[styles.tabText, currentStep === 2 && styles.activeTabText]}>2. Patient Detail</Text>
+                 {currentStep === 2 && <View style={styles.activeUnderline} />}
+               </TouchableOpacity>
+       
+               <TouchableOpacity 
+                 style={[styles.tab, currentStep === 3 && styles.activeTab]}
+                 onPress={() => setCurrentStep(3)}
+               >
+                 <Text style={[styles.tabText, currentStep === 3 && styles.activeTabText]}>3. Review</Text>
+                 {currentStep === 3 && <View style={styles.activeUnderline} />}
+               </TouchableOpacity>
+             </View>
 
         {/* Patient Info Section */}
         <View style={styles.section}>
@@ -168,24 +180,24 @@ const PatientDetail = () => {
       />
     </View>
     <View style={styles.container}>
-      <Text style={styles.title}>Emergency level</Text>
-      <View style={styles.radioGroup}>
-        {levels.map((level) => (
+    
+      <View style={styles.container3}>
+          <Text style={styles.title}>Emergency level</Text>
+      <View style={styles.levelsContainer3}>
+        {levels3.map((level) => (
           <TouchableOpacity
             key={level.value}
-            style={styles.radioItem}
-            onPress={() => setSelected(level.value)}
+            style={styles.levelItem3}
+            onPress={() => setSelectedLevel3(level.value)}
           >
-              <View style={[styles.radioCircle, selected === level.value && styles.radioSelected]} />
-            <Text style={styles.radioLabel}>{level.label}</Text>
-            <MaterialIcons
-              name={level.icon}
-              size={20}
-              color={level.color}
-              style={{ marginLeft: 4 }}
-            />
+            <View style={styles.radioCircle3}>
+              {selectedLevel3 === level.value && <View style={styles.selectedRb3} />}
+            </View>
+            <Text style={styles.levelText3}>{level.label}</Text>
+            <MaterialIcons name={level.icon} size={20} color={level.color} style={styles.icon3} />
           </TouchableOpacity>
         ))}
+      </View>
     </View>
     
     <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Review')}>
@@ -199,13 +211,64 @@ const PatientDetail = () => {
 };
 
 const styles = StyleSheet.create({
+  container3: {
+    padding: 16,
+  
+  },
+  title3: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: '#333',
+    fontWeight: '600',
+  },
+  levelsContainer3: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  levelItem3: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  radioCircle3: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#999',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 6,
+  },
+  selectedRb3: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#333',
+  },
+  levelText3: {
+    marginRight: 4,
+    fontSize: 14,
+    color: '#333',
+  },
+  icon3: {
+    marginLeft: 2,
+  },
+   
+  optionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
   },
   container: {
-    paddingHorizontal: 20,
-    margin:20
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 10,
   },
   radioGroup: {
     flexDirection: 'row',
@@ -229,7 +292,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#007aff',
   },
   radioLabel: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#333',
   },
   button: {
@@ -239,58 +302,97 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 6,
+    marginBottom: 15,
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 14,
     marginRight: 8,
     fontWeight: '500',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginLeft: 15,
+    marginLeft: 12,
   },
-  progressBar: {
+  // progressBar: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   alignItems: 'center',
+  //   marginBottom: 30,
+  //   paddingHorizontal: 5,
+  // },
+  // progressStep: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  // },
+  // progressStepNumber: {
+  //   fontSize: 16,
+  //   fontWeight: 'bold',
+  //   marginRight: 5,
+  //   color: '#888',
+  // },
+  // progressStepText: {
+  //   fontSize: 16,
+  //   color: '#888',
+  // },
+  // progressStepTextActive: {
+  //   fontSize: 16,
+  //   fontWeight: 'bold',
+  //   color: '#007bff',
+  //   borderBottomWidth: 2,
+  //   borderColor: '#007bff',
+  //   paddingBottom: 5,
+  // },
+  // progressSeparator: {
+  //   flex: 1,
+  //   height: 2,
+  //   backgroundColor: '#eee',
+  //   marginHorizontal: 5,
+  // },
+  tabsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
     alignItems: 'center',
-    marginBottom: 30,
-    paddingHorizontal: 5,
+    padding: 16,
   },
-  progressStep: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  progressStepNumber: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 5,
-    color: '#888',
-  },
-  progressStepText: {
-    fontSize: 16,
-    color: '#888',
-  },
-  progressStepTextActive: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#007bff',
-    borderBottomWidth: 2,
-    borderColor: '#007bff',
-    paddingBottom: 5,
-  },
-  progressSeparator: {
+  tab: {
     flex: 1,
-    height: 2,
-    backgroundColor: '#eee',
-    marginHorizontal: 5,
+    alignItems: 'center',
+    paddingVertical: 12,
   },
+  activeTab: {
+    backgroundColor: '#f8fafc',
+  },
+  tabText: {
+    fontSize: 14,
+    color: '#6b7280',
+  },
+  activeTabText: {
+    color: '#007AFF',
+    fontWeight: '500',
+  },
+  activeUnderline: {
+    height: 2,
+    backgroundColor: '#007AFF',
+    width: '100%',
+    marginTop: 8,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  // section: {
+  //   marginBottom: 24,
+  // },
   section: {
     marginBottom: 20,
   },
@@ -311,7 +413,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     padding: 12,
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 20,
   },
   row: {
@@ -330,7 +432,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   dropdownText: {
-    fontSize: 16,
+    fontSize: 14,
   },
   dropdownDropDownContainer: {
     borderColor: '#ddd',
@@ -348,7 +450,7 @@ const styles = StyleSheet.create({
   },
   uploadPrompt: {
     marginTop: 10,
-    fontSize: 16,
+    fontSize: 14,
     color: 'gray',
     fontWeight: '500',
   },
@@ -366,7 +468,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   documentName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#333',
   },

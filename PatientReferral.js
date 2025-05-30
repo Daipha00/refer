@@ -6,280 +6,272 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView // Added SafeAreaView here as well
+  SafeAreaView
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useNavigation } from '@react-navigation/native';
+import DropDownPicker from 'react-native-dropdown-picker';
 
-// Use the component name PatientReferral as you requested
+
 const PatientReferral = () => {
   const navigation = useNavigation();
-
-  // State for Receiving Facility Dropdown
-  const [receivingFacilityOpen, setReceivingFacilityOpen] = useState(false);
-  const [receivingFacilityValue, setReceivingFacilityValue] = useState('Mulago National Referral Hospital');
-  const [receivingFacilityItems, setReceivingFacilityItems] = useState([
-    { label: 'Mulago National Referral Hospital', value: 'Mulago National Referral Hospital' },
-    { label: 'Kiruddu National Referral Hospital', value: 'Kiruddu National Referral Hospital' },
-    { label: 'Kawempe National Referral Hospital', value: 'Kawempe National Referral Hospital' },
+  const [currentStep, setCurrentStep] = useState(1);
+  const [department, setDepartment] = useState('Hematology');
+  const [facility, setFacility] = useState('Mulago National Referral Hospital');
+  const [specialties, setSpecialties] = useState(['Surgeon', 'Pediatrician']);
+  const [facilityOpen, setFacilityOpen] = useState(false);
+  const [facilityValue, setFacilityValue] = useState(null);
+  const [facilityItems, setFacilityItems] = useState([
+    { label: 'Mulago National Referral Hospital', value: 'mulago' },
+    { label: 'Kiruddu National Referral Hospital', value: 'kiruddu' },
+    { label: 'Kawempe National Referral Hospital', value: 'kawempe' },
   ]);
 
-  // State for Specialty Dropdown
+  // Specialty dropdown state
   const [specialtyOpen, setSpecialtyOpen] = useState(false);
-  const [specialtyValue, setSpecialtyValue] = useState(['Surgeon', 'Pediatrician']);
+  const [specialtyValue, setSpecialtyValue] = useState([]);
   const [specialtyItems, setSpecialtyItems] = useState([
-    { label: 'Surgeon', value: 'Surgeon' },
-    { label: 'Pediatrician', value: 'Pediatrician' },
-    { label: 'Cardiologist', value: 'Cardiologist' },
-    { label: 'Neurologist', value: 'Neurologist' },
-    { label: 'Oncologist', value: 'Oncologist' },
-    { label: 'Hematologist', value: 'Hematologist' },
+    { label: 'Surgeon', value: 'surgeon' },
+    { label: 'Pediatrician', value: 'pediatrician' },
+    { label: 'Cardiologist', value: 'cardiologist' },
+    { label: 'Neurologist', value: 'neurologist' },
   ]);
+  const removeSpecialty = (valueToRemove) => {
+    setSpecialtyValue(specialtyValue.filter(val => val !== valueToRemove));
+  };
+  
 
   return (
-    <SafeAreaView style={styles.safeArea}> {/* Wrap content in SafeAreaView */}
-      <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <AntDesign name="arrowleft" size={24} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Patient's Referral</Text>
-        </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <AntDesign name="arrowleft" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Patient's Referral</Text>
+      </View>
 
-      
-        <View style={styles.progressBar}>
-          <TouchableOpacity style={styles.progressStep} onPress={() => navigation.navigate('ReferringDetails')}>
-            <Text style={styles.progressStepNumber}>1.</Text>
-            <Text style={styles.progressStepTextActive}>Referring Details</Text>
-          </TouchableOpacity>
-          <View style={styles.progressSeparator} />
-          <TouchableOpacity style={styles.progressStep} onPress={() => navigation.navigate('PatientDetail')}>
-            <Text style={styles.progressStepNumber}>2.</Text>
-            <Text style={styles.progressStepText}>Patient Detail</Text>
-          </TouchableOpacity>
-          <View style={styles.progressSeparator} />
-          <TouchableOpacity style={styles.progressStep} onPress={() => console.log('Navigate to Review')}> {/* Placeholder for Review */}
-            <Text style={styles.progressStepNumber}>3.</Text>
-            <Text style={styles.progressStepText}>Review</Text>
-          </TouchableOpacity>
-        </View>
+      {/* Multi-step tabs */}
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity 
+          style={[styles.tab, currentStep === 1 && styles.activeTab]}
+          onPress={() => setCurrentStep(1)}
+        >
+          <Text style={[styles.tabText, currentStep === 1 && styles.activeTabText]}>1. Referring Details</Text>
+          {currentStep === 1 && <View style={styles.activeUnderline} />}
+        </TouchableOpacity>
 
+        <TouchableOpacity 
+          style={[styles.tab, currentStep === 2 && styles.activeTab]}
+          onPress={() => setCurrentStep(2)}
+        >
+          <Text style={[styles.tabText, currentStep === 2 && styles.activeTabText]}>2. Patient Detail</Text>
+          {currentStep === 2 && <View style={styles.activeUnderline} />}
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.tab, currentStep === 3 && styles.activeTab]}
+          onPress={() => setCurrentStep(3)}
+        >
+          <Text style={[styles.tabText, currentStep === 3 && styles.activeTabText]}>3. Review</Text>
+          {currentStep === 3 && <View style={styles.activeUnderline} />}
+        </TouchableOpacity>
+      </View>
+
+      {/* Form content */}
+      <ScrollView style={styles.content}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Receiving Department</Text>
+          
           <Text style={styles.label}>Name of Department</Text>
           <TextInput
             style={styles.input}
-            placeholder="Hematology"
-           
-            editable={true}
+           placeholder='Enter Department Name'
+            onChangeText={setDepartment}
           />
 
           <Text style={styles.label}>Receiving Facility</Text>
-          <DropDownPicker
-            open={receivingFacilityOpen}
-            value={receivingFacilityValue}
-            items={receivingFacilityItems}
-            setOpen={setReceivingFacilityOpen}
-            setValue={setReceivingFacilityValue}
-            setItems={setReceivingFacilityItems}
-            containerStyle={styles.dropdownContainer}
-            style={styles.dropdown}
-            textStyle={styles.dropdownText}
-            dropDownContainerStyle={styles.dropdownDropDownContainer}
-            zIndex={3000}
-            renderBadge={() => (
-              <View style={styles.nrhBadge}>
-                <Text style={styles.nrhBadgeText}>NRH</Text>
-              </View>
-            )}
-          />
+      <DropDownPicker
+        open={facilityOpen}
+        value={facilityValue}
+        items={facilityItems}
+        setOpen={setFacilityOpen}
+        setValue={setFacilityValue}
+        setItems={setFacilityItems}
+        placeholder="Select facility"
+        style={styles.dropdown}
+        dropDownContainerStyle={styles.dropdownContainer}
+        textStyle={styles.dropdownText}
+        zIndex={3000}
+        zIndexInverse={1000}
+      />
 
           <Text style={styles.label}>Specialty</Text>
-          <DropDownPicker
-            open={specialtyOpen}
-            value={specialtyValue}
-            items={specialtyItems}
-            setOpen={setSpecialtyOpen}
-            setValue={setSpecialtyValue}
-            setItems={setSpecialtyItems}
-            multiple={true}
-            min={0}
-            max={5}
-            containerStyle={styles.dropdownContainer}
-            style={styles.dropdown}
-            textStyle={styles.dropdownText}
-            dropDownContainerStyle={styles.dropdownDropDownContainer}
-            zIndex={2000}
-            mode="BADGE"
-            badgeDotStyle={styles.badgeDot}
-            badgeSeparatorStyle={styles.badgeSeparator}
-            badgeStyle={styles.badgeStyle}
-            badgeTextStyle={styles.badgeTextStyle}
-          />
+      <DropDownPicker
+        open={specialtyOpen}
+        value={specialtyValue}
+        items={specialtyItems}
+        setOpen={setSpecialtyOpen}
+        setValue={setSpecialtyValue}
+        setItems={setSpecialtyItems}
+        multiple={true}
+        min={0}
+        max={5}
+        mode="BADGE"
+        placeholder="Select specialties"
+        style={styles.dropdown}
+        dropDownContainerStyle={styles.dropdownContainer}
+        textStyle={styles.dropdownText}
+        badgeDotColors={['#e6f2ff']}
+        zIndex={2000}
+        zIndexInverse={2000}
+      />
         </View>
       </ScrollView>
-        <View style={styles.container1}>
-            <TouchableOpacity style={styles.button1}>
-              <Text style={styles.buttonText1}>Enter Patient's details</Text>
-            </TouchableOpacity>
-          </View>
-          </View>
+
+      <View style={styles.footer}>
+      <TouchableOpacity 
+        style={styles.nextButton}
+        onPress={() => navigation.navigate('PatientDetail')}
+      >
+        <Text style={styles.nextButtonText}>Enter Patient's details</Text>
+      </TouchableOpacity>
+    </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: { 
-    flex: 1,
-    backgroundColor: '#fff', 
-  },
   container: {
-    flex: 1, 
-    paddingTop: 0, 
-    paddingHorizontal: 20,
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 150, // prevent last content being hidden behind fixed container
-  },
-  container1: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 30,
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    zIndex: 10, // ensure it stays on top
-  },
-  button1: {
-    backgroundColor: '#007AFF', 
-    borderRadius: 10,
-    paddingVertical: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText1: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
+    flex: 1,
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginLeft: 15,
+    marginLeft: 16,
   },
-  progressBar: {
+  tabsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
     alignItems: 'center',
-    marginBottom: 30,
-    paddingHorizontal: 5,
+    padding: 16,
   },
-  progressStep: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  progressStepNumber: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 5,
-    color: '#888',
-  },
-  progressStepText: {
-    fontSize: 16,
-    color: '#888',
-  },
-  progressStepTextActive: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#007bff',
-    borderBottomWidth: 2,
-    borderColor: '#007bff',
-    paddingBottom: 5,
-  },
-  progressSeparator: {
+  tab: {
     flex: 1,
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  activeTab: {
+    backgroundColor: '#f8fafc',
+  },
+  tabText: {
+    fontSize: 14,
+    color: '#6b7280',
+  },
+  activeTabText: {
+    color: '#007AFF',
+    fontWeight: '500',
+  },
+  activeUnderline: {
     height: 2,
-    backgroundColor: '#eee',
-    marginHorizontal: 5,
+    backgroundColor: '#007AFF',
+    width: '100%',
+    marginTop: 8,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#555',
+    marginBottom: 16,
+    color: '#374151',
   },
   label: {
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 8,
-    color: '#333',
+    color: '#374151',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#d1d5db',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    marginBottom: 20,
-    backgroundColor: '#f9f9f9',
+    marginBottom: 16,
+    backgroundColor: '#f9fafb',
   },
-  dropdownContainer: {
-    height: 50,
-    marginBottom: 20,
+  facilityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
   },
-  dropdown: {
-    borderColor: '#ddd',
-    borderRadius: 8,
-  },
-  dropdownText: {
+  facilityText: {
     fontSize: 16,
-  },
-  dropdownDropDownContainer: {
-    borderColor: '#ddd',
-    borderRadius: 8,
+    color: '#111827',
+    marginRight: 8,
   },
   nrhBadge: {
-    backgroundColor: '#e6f2ff',
+    backgroundColor: '#e0f2fe',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 5,
-    marginLeft: 10,
+    borderRadius: 4,
   },
   nrhBadgeText: {
-    color: '#007bff',
-    fontWeight: 'bold',
+    color: '#0369a1',
     fontSize: 12,
+    fontWeight: 'bold',
   },
-  badgeStyle: {
-    backgroundColor: '#e0e0e0',
-    borderRadius: 5,
-    marginRight: 5,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
+  specialtiesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 16,
   },
-  badgeTextStyle: {
-    color: '#333',
+  specialtyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
+    borderRadius: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  specialtyText: {
     fontSize: 14,
+    color: '#111827',
+    marginRight: 6,
   },
-  badgeDot: {
-    display: 'none',
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    backgroundColor: '#fff',
   },
-  badgeSeparator: {
-    display: 'none',
+  nextButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+    padding: 16,
+    alignItems: 'center',
+  },
+  nextButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
-export default PatientReferral; // Exporting PatientReferral as requested
+export default PatientReferral;
