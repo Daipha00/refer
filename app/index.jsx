@@ -1,11 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { SafeAreaView } from 'react-native';
 import { Image, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import SplashLogo from '../assets/images/splash-icon.png';
 export default function SplashScreen() {
   const router = useRouter();
-  const SplashLogo = require('../../assets/images/splash-icon.png');
+
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
