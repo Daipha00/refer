@@ -8,19 +8,17 @@ import {
   SafeAreaView,
   StatusBar 
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import UserNav from '../../components/userNav';
 import { useRouter } from 'expo-router';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigation = useNavigation();
   const router = useRouter();
 
   const handleLogin = () => {
     // Simply navigate to Multistep screen without validation
-    router.push('/Referring/Multistep');
+    router.replace('/(tabs)');
   };
 
   const handleForgotPassword = () => {
