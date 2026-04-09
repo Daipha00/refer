@@ -35,7 +35,9 @@ export default function SearchScreen() {
             <Feather name="search" size={18} color="#748196" />
             <Text style={styles.searchText}>search by name, specialty, hospital or city</Text>
           </View>
-          <MaterialCommunityIcons name="tune-variant" size={20} color="#748196" />
+          <Pressable onPress={() => router.push('/search/filter')} hitSlop={8}>
+            <MaterialCommunityIcons name="tune-variant" size={20} color="#748196" />
+          </Pressable>
         </View>
 
         <View style={styles.topTabs}>
@@ -57,15 +59,15 @@ export default function SearchScreen() {
           <Pressable style={[styles.filterChip, styles.filterChipActive]}>
             <Text style={[styles.filterChipText, styles.filterChipTextActive]}>All</Text>
           </Pressable>
-          <Pressable style={styles.filterChip}>
+          <Pressable style={styles.filterChip} onPress={() => router.push('/search/filter')}>
             <Text style={styles.filterChipText}>Department</Text>
             <Ionicons name="chevron-down" size={16} color="#202531" />
           </Pressable>
-          <Pressable style={styles.filterChip}>
+          <Pressable style={styles.filterChip} onPress={() => router.push('/search/filter')}>
             <Text style={styles.filterChipText}>Hospital</Text>
             <Ionicons name="chevron-down" size={16} color="#202531" />
           </Pressable>
-          <Pressable style={styles.filterChip}>
+          <Pressable style={styles.filterChip} onPress={() => router.push('/search/filter')}>
             <Text style={styles.filterChipText}>Distance</Text>
             <Ionicons name="chevron-down" size={16} color="#202531" />
           </Pressable>
