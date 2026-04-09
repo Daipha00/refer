@@ -21,7 +21,7 @@ export default function OnboardingScreen() {
         <TouchableOpacity
           style={styles.emergencyButton}
           onPress={() => {
-            router.replace('../Emergency');
+            router.replace('/Emergency');
           }}
         >
           <Text style={styles.emergencyButtonText}>Emergency Help?</Text>

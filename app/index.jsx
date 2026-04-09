@@ -3,28 +3,32 @@ import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import SplashLogo from '../assets/images/splash-icon.png';
+import SplashLogo from '../assets/images/icon.png';
 export default function SplashScreen() {
   const router = useRouter();
 
-
   useEffect(() => {
+    let timeoutId;
+
     const checkOnboardingStatus = async () => {
       const hasCompleted = await AsyncStorage.getItem('onboardingComplete');
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         if (hasCompleted === 'true') {
-          // router.replace('/Auth/register');
           router.replace('/onboarding');
-          // router.replace('/auth/login');
         } else {
           router.replace('/onboarding');
-          // router.replace('/Auth/register');
-          // replace this area
         }
-      }, 2000); // 2 seconds splash screen
+      }, 3000); // 3 seconds splash screen
     };
+
     checkOnboardingStatus();
-  }, []);
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [router]);
 
   return (
     <SafeAreaView style={styles.safeArea}>

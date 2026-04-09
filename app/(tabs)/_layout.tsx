@@ -45,6 +45,30 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Feather name="grid" size={size} color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="hospital/[id]"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="ambulance/[hospitalId]"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="ambulance/[hospitalId]/[ambulanceId]"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="department/[hospitalId]/[departmentId]/[stage]"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }

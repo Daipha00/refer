@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -9,529 +9,486 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import UserNav from '../../components/userNav';
 
-const register = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [activeTab, setActiveTab] = useState('create');
+const steps = ['Basic Detail', 'Professional Detail', 'Password'];
 
-  // Form data state
+const professionOptions = ['Doctor', 'Nurse', 'Nutritionist'];
+const levelOptions = ['Medical Officer', 'Consultant', 'Specialist'];
+const hospitalOptions = ['Mulago National Referral Hospital', 'Mbarara Regional Referral Hospital'];
+
+export default function Register() {
+  const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
     fullName: '',
-    gender: '',
+    gender: 'Female',
     phoneNumber: '',
     email: '',
-    medicalProfession: '',
+    medicalProfession: 'Doctor',
     licenseNumber: '',
-    professionLevel: '',
+    professionLevel: 'Medical Officer',
     departments: ['Surgeon', 'Pediatrician'],
-    primaryHospital: '',
+    primaryHospital: 'Mulago National Referral Hospital',
     password: '',
     confirmPassword: '',
   });
 
-  const steps = ['Basic Detail', 'Professional Detail', 'Password'];
-
   const updateFormData = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleContinue = () => {
-    if (currentStep < 2) {
-      setCurrentStep(currentStep + 1);
+    if (currentStep < steps.length - 1) {
+      setCurrentStep((prev) => prev + 1);
     } else {
-      // Handle form submission
       console.log('Form submitted:', formData);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
   const removeDepartment = (index) => {
-    const newDepartments = formData.departments.filter((_, i) => i !== index);
-    updateFormData('departments', newDepartments);
+    updateFormData(
+      'departments',
+      formData.departments.filter((_, itemIndex) => itemIndex !== index)
+    );
   };
-
-  const renderHeader = () => (
-    <View style={styles.header}>
-      {currentStep > 0 && (
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
-      )}
-      <View style={styles.headerContent}>
-        <Text style={styles.headerTitle}>Join the Medical Referral Network</Text>
-        <Text style={styles.headerSubtitle}>Connect with hospitals and specialists across Uganda</Text>
-      </View>
-    </View>
-  );
-
-
-
-  const renderTabs = () => (
-    <View style={styles.tabContainer}>
-      < UserNav />
-    </View>
-  );
-
 
   const renderStepIndicator = () => (
     <View style={styles.stepContainer}>
       {steps.map((step, index) => (
-        <View key={index} style={styles.stepWrapper}>
-          <View style={styles.stepItem}>
-            <View style={[
+        <View key={step} style={styles.stepItem}>
+          <View
+            style={[
               styles.stepLine,
               index < currentStep && styles.completedStepLine,
               index === currentStep && styles.activeStepLine,
-              index > currentStep && styles.inactiveStepLine
-            ]} />
-            <Text style={[
+            ]}
+          />
+          <Text
+            style={[
               styles.stepText,
               index < currentStep && styles.completedStepText,
               index === currentStep && styles.activeStepText,
-              index > currentStep && styles.inactiveStepText
-            ]}>
-              {step}
-            </Text>
-          </View>
+            ]}
+          >
+            {step}
+          </Text>
         </View>
       ))}
     </View>
   );
 
+  const renderInput = ({ label, value, onChangeText, placeholder, helperText, keyboardType, secureTextEntry }) => (
+    <View style={styles.inputGroup}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        style={styles.input}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor="#98A2B3"
+        keyboardType={keyboardType}
+        secureTextEntry={secureTextEntry}
+        autoCapitalize="none"
+      />
+      {helperText ? <Text style={styles.helperText}>{helperText}</Text> : null}
+    </View>
+  );
+
+  const renderSelect = ({ label, value }) => (
+    <View style={styles.inputGroup}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={styles.selectField}>
+        <Text style={styles.selectText}>{value}</Text>
+        <Ionicons name="chevron-down-outline" size={18} color="#667085" />
+      </View>
+    </View>
+  );
+
   const renderBasicDetails = () => (
     <View style={styles.formContainer}>
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Full Name</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.fullName}
-          onChangeText={(text) => updateFormData('fullName', text)}
-          placeholder="John Doe"
-        />
-        <Text style={styles.helperText}>Enter your name as it appears on your medical license</Text>
-      </View>
+      {renderInput({
+        label: 'Full Name',
+        value: formData.fullName,
+        onChangeText: (text) => updateFormData('fullName', text),
+        placeholder: 'John Doe',
+        helperText: 'Enter your name as it appears on your medical license',
+      })}
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Gender</Text>
         <View style={styles.radioContainer}>
-          <TouchableOpacity
-            style={styles.radioOption}
-            onPress={() => updateFormData('gender', 'Female')}
-          >
-            <View style={[styles.radio, formData.gender === 'Female' && styles.radioSelected]} />
-            <Text style={styles.radioText}>Female</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.radioOption}
-            onPress={() => updateFormData('gender', 'Male')}
-          >
-            <View style={[styles.radio, formData.gender === 'Male' && styles.radioSelected]} />
-            <Text style={styles.radioText}>Male</Text>
-          </TouchableOpacity>
+          {['Female', 'Male'].map((gender) => (
+            <TouchableOpacity
+              key={gender}
+              style={styles.radioOption}
+              onPress={() => updateFormData('gender', gender)}
+            >
+              <View style={[styles.radio, formData.gender === gender && styles.radioSelected]}>
+                {formData.gender === gender ? <View style={styles.radioInner} /> : null}
+              </View>
+              <Text style={styles.radioText}>{gender}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Phone Number</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.phoneNumber}
-          onChangeText={(text) => updateFormData('phoneNumber', text)}
-          placeholder="+256 772 123 456"
-          keyboardType="phone-pad"
-        />
-        <Text style={styles.helperText}>Your work or official contact number</Text>
-      </View>
+      {renderInput({
+        label: 'Phone Number',
+        value: formData.phoneNumber,
+        onChangeText: (text) => updateFormData('phoneNumber', text),
+        placeholder: '+256 772 123 456',
+        helperText: 'Your work or official contact number',
+        keyboardType: 'phone-pad',
+      })}
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Email Address</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.email}
-          onChangeText={(text) => updateFormData('email', text)}
-          placeholder="doctor@hospital.go.ug"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <Text style={styles.helperText}>We'll send a verification link to this email</Text>
-      </View>
+      {renderInput({
+        label: 'Email Address',
+        value: formData.email,
+        onChangeText: (text) => updateFormData('email', text),
+        placeholder: 'doctor@hospital.go.ug',
+        helperText: "We'll send a verification link to this email",
+        keyboardType: 'email-address',
+      })}
     </View>
   );
 
   const renderProfessionalDetails = () => (
     <View style={styles.formContainer}>
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Medical Profession</Text>
-        <View style={styles.dropdown}>
-          <Text style={styles.dropdownText}>{formData.medicalProfession}</Text>
-          <Text style={styles.dropdownArrow}>▼</Text>
-        </View>
-      </View>
+      {renderSelect({
+        label: 'Medical Profession',
+        value: formData.medicalProfession || professionOptions[0],
+      })}
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Medical License Number</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.licenseNumber}
-          onChangeText={(text) => updateFormData('licenseNumber', text)}
-          placeholder="UMC - 2024 - ......."
-        />
-        <Text style={styles.helperText}>Your Uganda Medical Council registration number</Text>
-      </View>
+      {renderInput({
+        label: 'Medical License Number',
+        value: formData.licenseNumber,
+        onChangeText: (text) => updateFormData('licenseNumber', text),
+        placeholder: 'UMC - 2024 - .......',
+        helperText: 'Your Uganda Medical Council registration number',
+      })}
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Profession Level</Text>
-        <View style={styles.dropdown}>
-          <Text style={styles.dropdownText}>{formData.professionLevel}</Text>
-          <Text style={styles.dropdownArrow}>▼</Text>
-        </View>
-      </View>
+      {renderSelect({
+        label: 'Profession Level',
+        value: formData.professionLevel || levelOptions[0],
+      })}
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Current Department</Text>
         <View style={styles.departmentContainer}>
-          {formData.departments.map((dept, index) => (
-            <View key={index} style={styles.departmentTag}>
-              <Text style={styles.departmentText}>{dept}</Text>
-              <TouchableOpacity onPress={() => removeDepartment(index)}>
-                <Text style={styles.removeTag}>×</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-          <Text style={styles.dropdownArrow}>▼</Text>
+          <View style={styles.departmentTagsWrap}>
+            {formData.departments.map((dept, index) => (
+              <View key={`${dept}-${index}`} style={styles.departmentTag}>
+                <Text style={styles.departmentText}>{dept}</Text>
+                <TouchableOpacity onPress={() => removeDepartment(index)} hitSlop={6}>
+                  <Ionicons name="close" size={16} color="#667085" />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+          <Ionicons name="chevron-down-outline" size={18} color="#667085" />
         </View>
       </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Primary Hospital</Text>
-        <View style={styles.dropdown}>
-          <Text style={styles.dropdownText}>{formData.primaryHospital}</Text>
-          <Text style={styles.dropdownArrow}>▼</Text>
-        </View>
-      </View>
+      {renderSelect({
+        label: 'Primary Hospital',
+        value: formData.primaryHospital || hospitalOptions[0],
+      })}
     </View>
   );
 
   const renderPasswordStep = () => (
     <View style={styles.formContainer}>
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Create Password</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.password}
-          onChangeText={(text) => updateFormData('password', text)}
-          placeholder="enter a strong password"
-          secureTextEntry
-        />
-        <Text style={styles.helperText}>Must be at least 8 characters</Text>
-      </View>
+      {renderInput({
+        label: 'Create Password',
+        value: formData.password,
+        onChangeText: (text) => updateFormData('password', text),
+        placeholder: 'enter a strong password',
+        helperText: 'Must be at least 8 characters',
+        secureTextEntry: true,
+      })}
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Re-enter Password</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.confirmPassword}
-          onChangeText={(text) => updateFormData('confirmPassword', text)}
-          placeholder="enter a strong password"
-          secureTextEntry
-        />
-        <Text style={styles.helperText}>Must be at least 8 characters</Text>
-      </View>
+      {renderInput({
+        label: 'Re-enter Password',
+        value: formData.confirmPassword,
+        onChangeText: (text) => updateFormData('confirmPassword', text),
+        placeholder: 'enter a strong password',
+        helperText: 'Must be at least 8 characters',
+        secureTextEntry: true,
+      })}
 
       <View style={styles.termsContainer}>
         <Text style={styles.termsText}>
-          By signing up, you agree to our terms of service and privacy policy.
-          Your information will be verified with the Uganda Medical Council.
+          By signing up, you agree to our terms of service and privacy policy. Your information will be
+          verified with the Uganda Medical Council.
         </Text>
       </View>
     </View>
   );
 
   const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 0:
-        return renderBasicDetails();
-      case 1:
-        return renderProfessionalDetails();
-      case 2:
-        return renderPasswordStep();
-      default:
-        return renderBasicDetails();
-    }
+    if (currentStep === 0) return renderBasicDetails();
+    if (currentStep === 1) return renderProfessionalDetails();
+    return renderPasswordStep();
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {renderHeader()}
-        {renderTabs()}
+      <StatusBar barStyle="dark-content" backgroundColor="#F7FAFF" />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <View style={styles.backWrap}>
+            {currentStep > 0 ? (
+              <TouchableOpacity onPress={handleBack} hitSlop={8}>
+                <Ionicons name="chevron-back-outline" size={26} color="#202531" />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+          <View style={styles.headerTextWrap}>
+            <Text style={styles.headerTitle}>Join the Medical Referral Network</Text>
+            <Text style={styles.headerSubtitle}>Connect with hospitals and specialists across Uganda</Text>
+          </View>
+        </View>
+
+        <View style={styles.tabContainer}>
+          <UserNav />
+        </View>
+
         {renderStepIndicator()}
         {renderCurrentStep()}
 
         <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
           <Text style={styles.continueButtonText}>
-            {currentStep === 2 ? 'Create Account' : 'Continue →'}
+            {currentStep === steps.length - 1 ? 'Create Account' : 'Continue'}
           </Text>
+          {currentStep < steps.length - 1 ? (
+            <Ionicons name="arrow-forward" size={18} color="#FFFFFF" style={styles.buttonIcon} />
+          ) : null}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F7FAFF',
   },
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 42,
+    paddingBottom: 36,
+  },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    alignItems: 'flex-start',
+    marginBottom: 21,
   },
-  backButton: {
-    marginRight: 10,
-    padding: 5,
+  backWrap: {
+    width: 32,
+    marginRight: 8,
+    paddingTop: 13,
   },
-  backButtonText: {
-    fontSize: 20,
-    color: '#333',
-  },
-  headerContent: {
+  headerTextWrap: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    color: '#202531',
+    fontSize: 20,
+    fontWeight: '700',
+    marginTop: 13,
   },
   headerSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
+    color: '#667085',
+    fontSize: 16,
+    lineHeight: 24,
   },
   tabContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-    paddingTop: 10,
+    marginBottom: 14,
   },
-  tab: {
-    flex: 1,
-    paddingVertical: 15,
-    alignItems: 'center',
-    backgroundColor: '#e9ecef',
-    borderRadius: 8,
-    marginHorizontal: 3,
-  },
-  activeTab: {
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: -1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  tabText: {
-    fontSize: 16,
-    color: '#666',
-    fontWeight: '500',
-  },
-  activeTabText: {
-    color: '#333',
-    fontWeight: '600',
-  },
-
   stepContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-start',
-    paddingHorizontal: 15,
-    paddingTop: 20,
-    paddingBottom: 25,
-    backgroundColor: '#fff',
-  },
-  stepWrapper: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: 10,
+    columnGap: 12,
+    marginBottom: 28,
   },
   stepItem: {
-    alignItems: 'center',
-    width: '100%',
+    flex: 1,
   },
   stepLine: {
-    width: '100%',
-    height: 3,
-    backgroundColor: '#ddd',
-    marginBottom: 10,
-    borderRadius: 1.5,
-  },
-  completedStepLine: {
-    backgroundColor: '#4caf50',
-  },
-  activeStepLine: {
-    backgroundColor: '#1976d2',
-  },
-  inactiveStepLine: {
-    backgroundColor: '#ddd',
-  },
-  stepText: {
-    fontSize: 12,
-    textAlign: 'center',
-    fontWeight: '500',
-  },
-  completedStepText: {
-    color: '#4caf50',
-  },
-  activeStepText: {
-    color: '#1976d2',
-  },
-  inactiveStepText: {
-    color: '#999',
-  },
-  formContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
+    height: 2,
+    borderRadius: 999,
+    backgroundColor: '#667085',
     marginBottom: 8,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
+  completedStepLine: {
+    backgroundColor: '#1E7A39',
+  },
+  activeStepLine: {
+    backgroundColor: '#2563EB',
+  },
+  stepText: {
+    color: '#667085',
+    fontSize: 13,
+  },
+  completedStepText: {
+    color: '#1E7A39',
+  },
+  activeStepText: {
+    color: '#2563EB',
+  },
+  formContainer: {
+    marginBottom: 28,
+  },
+  inputGroup: {
+    marginBottom: 24,
+  },
+  label: {
+    color: '#475467',
     fontSize: 16,
-    color: '#333',
+    marginBottom: 10,
+  },
+  input: {
+    minHeight: 52,
+    borderWidth: 1,
+    borderColor: '#CAD5E2',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: '#202531',
+    fontSize: 16,
   },
   helperText: {
+    color: '#667085',
     fontSize: 12,
-    color: '#666',
-    marginTop: 5,
+    lineHeight: 18,
+    marginTop: 8,
   },
   radioContainer: {
     flexDirection: 'row',
+    columnGap: 34,
+    paddingVertical: 6,
   },
   radioOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 30,
   },
   radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#ddd',
-    marginRight: 8,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: '#D0D5DD',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    backgroundColor: '#FFFFFF',
   },
   radioSelected: {
-    borderColor: '#1976d2',
-    backgroundColor: '#1976d2',
+    borderColor: '#2563EB',
+  },
+  radioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#2563EB',
   },
   radioText: {
+    color: '#475467',
     fontSize: 16,
-    color: '#333',
   },
-  dropdown: {
+  selectField: {
+    minHeight: 52,
+    borderWidth: 1,
+    borderColor: '#CAD5E2',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
   },
-  dropdownText: {
+  selectText: {
+    color: '#667085',
     fontSize: 16,
-    color: '#333',
     flex: 1,
-  },
-  dropdownArrow: {
-    fontSize: 12,
-    color: '#666',
+    marginRight: 12,
   },
   departmentContainer: {
+    minHeight: 52,
+    borderWidth: 1,
+    borderColor: '#2563EB',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  departmentTagsWrap: {
+    flexDirection: 'row',
     flexWrap: 'wrap',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    minHeight: 48,
+    gap: 8,
+    flex: 1,
+    marginRight: 10,
   },
   departmentTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e3f2fd',
-    borderRadius: 15,
+    backgroundColor: '#EEF2F6',
+    borderRadius: 6,
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginRight: 8,
-    marginBottom: 4,
+    paddingVertical: 7,
   },
   departmentText: {
-    fontSize: 14,
-    color: '#1976d2',
-    marginRight: 5,
-  },
-  removeTag: {
-    fontSize: 16,
-    color: '#1976d2',
-    fontWeight: 'bold',
+    color: '#475467',
+    fontSize: 15,
+    marginRight: 6,
   },
   termsContainer: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
+    backgroundColor: '#EEF2F6',
     borderRadius: 8,
-    marginTop: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
   },
   termsText: {
-    fontSize: 12,
-    color: '#666',
-    lineHeight: 18,
+    color: '#344054',
+    fontSize: 14,
+    lineHeight: 24,
   },
   continueButton: {
-    backgroundColor: '#1976d2',
-    marginHorizontal: 20,
-    marginVertical: 30,
-    paddingVertical: 15,
-    borderRadius: 8,
+    minHeight: 48,
+    borderRadius: 6,
+    backgroundColor: '#0F4CBA',
     alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   continueButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '500',
+  },
+  buttonIcon: {
+    marginLeft: 8,
   },
 });
-
-export default register;

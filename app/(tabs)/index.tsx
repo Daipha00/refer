@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Image,
   Pressable,
@@ -7,38 +7,39 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AntDesign, Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { hospitalProfiles } from '../hospital/data';
 
 const hospitals = [
   {
     id: 'uci',
-    name: 'Uganda Cancer Institute National Referral Hospital',
-    departments: '42 Departments',
-    distance: '45 km away',
-    image: require('../../assets/images/umboardimg/hospi.png'),
+    name: hospitalProfiles.uci.name,
+    departments: hospitalProfiles.uci.departmentsCount,
+    distance: hospitalProfiles.uci.distance,
+    image: hospitalProfiles.uci.image,
   },
   {
     id: 'butabika',
-    name: 'Butabika National Referral Hospital',
-    departments: '56 Departments',
-    distance: '2 km away',
-    image: require('../../assets/images/umboardimg/hospit.png'),
+    name: hospitalProfiles.butabika.name,
+    departments: hospitalProfiles.butabika.departmentsCount,
+    distance: hospitalProfiles.butabika.distance,
+    image: hospitalProfiles.butabika.image,
   },
   {
     id: 'uhi',
-    name: 'Uganda Heart Institute National Referral Hospital',
-    departments: '112 Departments',
-    distance: '1 km away',
-    image: require('../../assets/images/umboardimg/nurs.png'),
+    name: hospitalProfiles.uhi.name,
+    departments: hospitalProfiles.uhi.departmentsCount,
+    distance: hospitalProfiles.uhi.distance,
+    image: hospitalProfiles.uhi.image,
   },
   {
     id: 'entebbe',
-    name: 'Entebbe National Referral Hospital for Infectious Dise...',
-    departments: '211 Departments',
-    distance: '2 km away',
-    image: require('../../assets/images/umboardimg/hospi.png'),
+    name: hospitalProfiles.entebbe.name,
+    departments: hospitalProfiles.entebbe.departmentsCount,
+    distance: hospitalProfiles.entebbe.distance,
+    image: hospitalProfiles.entebbe.image,
   },
 ];
 
@@ -80,6 +81,18 @@ function SectionHeader({ title, subtitle, onPress }: { title: string; subtitle: 
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<'hospital' | 'ambulance'>('hospital');
+  const ambulanceCards = useMemo(
+    () =>
+      Object.values(hospitalProfiles).flatMap((hospital) =>
+        (hospital.ambulances ?? []).map((ambulance) => ({
+          ...ambulance,
+          hospitalId: hospital.id,
+          hospitalName: hospital.name,
+        }))
+      ),
+    []
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -110,62 +123,126 @@ export default function HomeScreen() {
         <SearchBar onPress={() => router.push('/search')} />
 
         <View style={styles.inlineTabs}>
-          <Pressable style={[styles.inlineTab, styles.inlineTabActive]}>
+          <Pressable
+            style={[styles.inlineTab, activeTab === 'hospital' && styles.inlineTabActive]}
+            onPress={() => setActiveTab('hospital')}
+          >
             <View style={styles.inlineTabLabel}>
-              <MaterialCommunityIcons name="hospital-building" size={16} color="#2563EB" />
-              <Text style={[styles.inlineTabText, styles.inlineTabTextActive]}>Hospital</Text>
+              <MaterialCommunityIcons
+                name="hospital-building"
+                size={16}
+                color={activeTab === 'hospital' ? '#2563EB' : '#4B5563'}
+              />
+              <Text style={[styles.inlineTabText, activeTab === 'hospital' && styles.inlineTabTextActive]}>
+                Hospital
+              </Text>
             </View>
           </Pressable>
-          <Pressable style={styles.inlineTab}>
+          <Pressable
+            style={[styles.inlineTab, activeTab === 'ambulance' && styles.inlineTabActive]}
+            onPress={() => setActiveTab('ambulance')}
+          >
             <View style={styles.inlineTabLabel}>
-              <MaterialCommunityIcons name="ambulance" size={16} color="#4B5563" />
-              <Text style={styles.inlineTabText}>Ambulance</Text>
+              <MaterialCommunityIcons
+                name="ambulance"
+                size={16}
+                color={activeTab === 'ambulance' ? '#2563EB' : '#4B5563'}
+              />
+              <Text style={[styles.inlineTabText, activeTab === 'ambulance' && styles.inlineTabTextActive]}>
+                Ambulance
+              </Text>
             </View>
           </Pressable>
         </View>
 
-        <SectionHeader title="Hospitals" subtitle="National Referral Hospitals" onPress={() => router.push('/search')} />
-        <View style={styles.hospitalGrid}>
-          {hospitals.map((hospital) => (
-            <Pressable
-              key={hospital.id}
-              style={styles.hospitalCard}
-              onPress={() => router.push('/referral/empty')}
-            >
-              <Image source={hospital.image} style={styles.hospitalImage} />
-              <Text style={styles.hospitalName}>{hospital.name}</Text>
-              <View style={styles.metaRow}>
-                <Feather name="briefcase" size={13} color="#6B7280" />
-                <Text style={styles.metaText}>{hospital.departments}</Text>
-                <Text style={styles.metaText}>{hospital.distance}</Text>
-              </View>
-            </Pressable>
-          ))}
-        </View>
+        {activeTab === 'hospital' ? (
+          <>
+            <SectionHeader title="Hospitals" subtitle="National Referral Hospitals" onPress={() => router.push('/search')} />
+            <View style={styles.hospitalGrid}>
+              {hospitals.map((hospital) => (
+                <Pressable
+                  key={hospital.id}
+                  style={styles.hospitalCard}
+                  onPress={() => router.push(`/hospital/${hospital.id}`)}
+                >
+                  <Image source={hospital.image} style={styles.hospitalImage} />
+                  <Text style={styles.hospitalName}>{hospital.name}</Text>
+                  <View style={styles.metaRow}>
+                    <Feather name="briefcase" size={13} color="#6B7280" />
+                    <Text style={styles.metaText}>{hospital.departments}</Text>
+                    <Text style={styles.metaText}>{hospital.distance}</Text>
+                  </View>
+                </Pressable>
+              ))}
+            </View>
 
-        <SectionHeader title="Departments" subtitle="Most Hospitals Offering" onPress={() => router.push('/search')} />
-        <View style={styles.departmentGrid}>
-          {departments.map((department) => (
-            <Pressable
-              key={department.id}
-              style={[styles.departmentCard, { backgroundColor: department.color }]}
-              onPress={() => router.push('/referral/empty')}
-            >
-              <View style={styles.departmentIconWrap}>
-                {department.icon === 'kidney' ? (
-                  <MaterialCommunityIcons name="kidney" size={20} color="#6B7280" />
-                ) : (
-                  <Ionicons name={department.icon as 'eye-outline' | 'water-outline' | 'female-outline'} size={20} color="#6B7280" />
-                )}
-              </View>
-              <Text style={styles.departmentTitle}>{department.title}</Text>
-              <View style={styles.departmentMetaRow}>
-                <MaterialCommunityIcons name="hospital-building" size={14} color="#6B7280" />
-                <Text style={styles.departmentMeta}>{department.hospitals}</Text>
-              </View>
-            </Pressable>
-          ))}
-        </View>
+            <SectionHeader title="Departments" subtitle="Most Hospitals Offering" onPress={() => router.push('/search')} />
+            <View style={styles.departmentGrid}>
+              {departments.map((department) => (
+                <Pressable
+                  key={department.id}
+                  style={[styles.departmentCard, { backgroundColor: department.color }]}
+                  onPress={() => router.push('/referral/empty')}
+                >
+                  <View style={styles.departmentIconWrap}>
+                    {department.icon === 'kidney' ? (
+                      <MaterialCommunityIcons name="kidney" size={20} color="#6B7280" />
+                    ) : (
+                      <Ionicons name={department.icon as 'eye-outline' | 'water-outline' | 'female-outline'} size={20} color="#6B7280" />
+                    )}
+                  </View>
+                  <Text style={styles.departmentTitle}>{department.title}</Text>
+                  <View style={styles.departmentMetaRow}>
+                    <MaterialCommunityIcons name="hospital-building" size={14} color="#6B7280" />
+                    <Text style={styles.departmentMeta}>{department.hospitals}</Text>
+                  </View>
+                </Pressable>
+              ))}
+            </View>
+          </>
+        ) : (
+          <>
+            <SectionHeader title="Facility" subtitle="National Referral Hospitals" onPress={() => router.push('/search')} />
+            <View style={styles.hospitalGrid}>
+              {ambulanceCards.map((ambulance) => (
+                <Pressable
+                  key={ambulance.id}
+                  style={styles.ambulanceHomeCard}
+                  onPress={() => router.push(`/ambulance/${ambulance.hospitalId}/${ambulance.id}`)}
+                >
+                  <Image source={ambulance.image} style={styles.hospitalImage} />
+                  <Text style={styles.ambulanceHomeCode}>{ambulance.code}</Text>
+                  <Text style={styles.ambulanceHomeHospital}>{ambulance.hospitalName}</Text>
+                  <Text
+                    style={[
+                      styles.ambulanceHomeStatus,
+                      ambulance.status === 'Available' ? styles.availableText : styles.unavailableText,
+                    ]}
+                  >
+                    {ambulance.status}
+                  </Text>
+                  <View style={styles.ambulanceHomeMeta}>
+                    <Text style={styles.metaText}>Grade</Text>
+                    <View
+                      style={[
+                        styles.homeGradeBadge,
+                        ambulance.grade === 'A'
+                          ? styles.gradeA
+                          : ambulance.grade === 'B'
+                            ? styles.gradeB
+                            : styles.gradeC,
+                      ]}
+                    >
+                      <Text style={styles.homeGradeText}>{ambulance.grade}</Text>
+                    </View>
+                    <AntDesign name="star" size={13} color="#D4A600" />
+                    <Text style={styles.metaText}>{ambulance.rating}</Text>
+                  </View>
+                </Pressable>
+              ))}
+            </View>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -321,6 +398,15 @@ const styles = StyleSheet.create({
     width: '48%',
     marginBottom: 18,
   },
+  ambulanceHomeCard: {
+    width: '48%',
+    marginBottom: 18,
+    borderWidth: 1,
+    borderColor: '#E5EAF2',
+    borderRadius: 6,
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+  },
   hospitalImage: {
     width: '100%',
     height: 128,
@@ -342,6 +428,56 @@ const styles = StyleSheet.create({
   metaText: {
     color: '#6B7280',
     fontSize: 12,
+  },
+  ambulanceHomeCode: {
+    color: '#202531',
+    fontSize: 15,
+    marginTop: 10,
+    marginBottom: 8,
+    paddingHorizontal: 10,
+  },
+  ambulanceHomeHospital: {
+    color: '#475467',
+    fontSize: 14,
+    lineHeight: 22,
+    paddingHorizontal: 10,
+    marginBottom: 8,
+  },
+  ambulanceHomeStatus: {
+    fontSize: 14,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  availableText: {
+    color: '#15803D',
+  },
+  unavailableText: {
+    color: '#667085',
+  },
+  ambulanceHomeMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 10,
+    paddingBottom: 12,
+  },
+  homeGradeBadge: {
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  homeGradeText: {
+    color: '#344054',
+    fontSize: 13,
+  },
+  gradeA: {
+    backgroundColor: '#FFD5D2',
+  },
+  gradeB: {
+    backgroundColor: '#FFF3BF',
+  },
+  gradeC: {
+    backgroundColor: '#D1FADF',
   },
   departmentGrid: {
     flexDirection: 'row',

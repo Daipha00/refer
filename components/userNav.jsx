@@ -1,18 +1,11 @@
 import { usePathname, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
 
 const UserNav = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const [path, setPath] = useState("");
-
-  useEffect(() => {
-    if (pathname) {
-      setPath(pathname);
-    }
-  }, [pathname]);
+  const path = pathname || "";
 
   return (
     <View style={styles.navContainer}>
@@ -25,7 +18,7 @@ const UserNav = () => {
         ]}
         disabled={path === "/Auth/register"}
       >
-        <Text style={styles.navText}>Create Account</Text>
+        <Text style={[styles.navText, path === "/Auth/register" && styles.activeNavText]}>Create Account</Text>
       </TouchableOpacity>
 
       {/* Login Button */}
@@ -34,7 +27,7 @@ const UserNav = () => {
         style={[styles.navButton, path === "/Auth/login" && styles.activeButton]}
         disabled={path === "/Auth/login"}
       >
-        <Text style={styles.navText}>Login</Text>
+        <Text style={[styles.navText, path === "/Auth/login" && styles.activeNavText]}>Login</Text>
       </TouchableOpacity>
 
     </View>
@@ -46,34 +39,37 @@ export default UserNav;
 
 const styles = StyleSheet.create({
   navContainer: {
-   backgroundColor:"#EFF1F4",
-   borderRadius: 10,
+   backgroundColor:"#EEF2F6",
+   borderRadius: 8,
     flexDirection: "row",
     gap: 8,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 6,
+    padding: 4,
     width:"100%",
   },
   navButton: {
-      display:"flex",
     alignContent:"center",
     justifyContent:"center",
     textAlign: "center",
-    padding: 12,
+    paddingVertical: 12,
     borderRadius: 6,
-    width: 160,
+    flex: 1,
   },
   activeButton: {
     backgroundColor: "white",
-    display:"flex",
     alignContent:"center",
     justifyContent:"center",
+    borderWidth: 1,
+    borderColor: "#E4E7EC",
   },
   navText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "500",
-    color: "#1C1F24",
+    color: "#667085",
     textAlign:"center"
+  },
+  activeNavText: {
+    color: "#202531",
   },
 });
